@@ -1,11 +1,17 @@
+import '@mantine/core/styles.css';
+
 import { TbEdit, TbTrash } from 'react-icons/tb';
 import { ActionIcon, AppShell, Burger, Group, Skeleton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useFetchNotes } from '@/entities';
 import { Routering } from '../pages';
 import { AppMantineProvider, AppRouter } from './';
 
 export const App = () => {
   const [opened, { toggle }] = useDisclosure();
+
+  const { notes, isLoading } = useFetchNotes();
+  console.log(notes, isLoading);
 
   return (
     <AppMantineProvider>

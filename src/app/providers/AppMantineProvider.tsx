@@ -1,13 +1,9 @@
-// import { CacheProvider } from "@emotion/react";
-// import createCache from "@emotion/cache";
 import { ReactNode } from 'react';
 import { createTheme, MantineProvider } from '@mantine/core';
 
 interface AppMantineProviderProps {
   children: ReactNode;
 }
-
-// const emotionCache = createCache({ key: "css", prepend: true });
 
 const theme = createTheme({
   fontFamily:
@@ -53,10 +49,8 @@ const theme = createTheme({
 
 export const AppMantineProvider = ({ children }: AppMantineProviderProps) => {
   return (
-    // <CacheProvider value={emotionCache}>
     <MantineProvider theme={theme} defaultColorScheme="dark">
       {children}
     </MantineProvider>
-    // </CacheProvider>
   );
 };
