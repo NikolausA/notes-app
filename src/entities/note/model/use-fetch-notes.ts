@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react';
 import { onValue, ref } from 'firebase/database';
 import { db } from '../../../firebase';
+import { Notes } from '../../../shared';
 
 export const useFetchNotes = () => {
-  const [notes, setNotes] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [notes, setNotes] = useState<Notes>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const notesDbRef = ref(db, 'notes');
 
-    return onValue(notesDbRef, (snapshot) => {
-      const loadedNotes = snapshot.val() || [];
+    const unsubscribe = onValue(notesDbRef, (snapshot) => {
+      const loadedNotes = (snapshot.val() || {}) as Notes;
 
       setNotes(loadedNotes);
       setIsLoading(false);
     });
+
+    return unsubscribe;
   }, []);
 
   return { notes, isLoading };
