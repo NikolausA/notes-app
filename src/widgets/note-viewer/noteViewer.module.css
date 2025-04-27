@@ -1,0 +1,27 @@
+.typoContent h1 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.typoContent h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.typoContent p {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.typoContent ul {
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.typoContent blockquote {
+  margin: 12px 0;
+  padding-left: 16px;
+  border-left: 3px solid #ccc;
+  color: #514f4f;
+  font-style: italic;
+}
