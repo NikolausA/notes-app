@@ -1,24 +1,55 @@
-import { useState } from 'react';
-import { TbEdit, TbLogout, TbTrash } from 'react-icons/tb';
+import { useEffect, useState } from 'react';
+import { TbDeviceFloppy, TbEdit, TbLogout, TbPlus, TbSearch, TbTrash } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
-import { ActionIcon, AppShell, Burger, Flex, Group, Text } from '@mantine/core';
+import { ActionIcon, AppShell, Burger, Flex, Text, TextInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useFetchNotes } from '@/entities';
 import { useAuth } from '../';
-import { Note } from '../../shared';
-import { NoteCard, NotePlaceholder, NoteViewer } from '../../widgets';
+import { filterNotesBySearch, NoteData, useDebounce } from '../../shared';
+import { NoteCard, NoteEditor, NotePlaceholder, NoteViewer } from '../../widgets';
 
 export const NotesLayout = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [opened, { toggle }] = useDisclosure();
   const { notes, isLoading } = useFetchNotes();
+  const [filtredNotes, setFiltredNotes] = useState<Array<[string, NoteData]>>([]);
+
+  useEffect(() => {
+    setFiltredNotes(filterNotesBySearch(notes, searchQuery));
+  }, [notes]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  useDebounce(() => setFiltredNotes(() => filterNotesBySearch(notes, searchQuery)), 1000, [
+    notes,
+    searchQuery,
+  ]);
+
+  // console.log(filtredNotes);
 
   const { user, signout } = useAuth();
   const navigate = useNavigate();
 
-  const selectedNote: Note | null = selectedNoteId ? notes[selectedNoteId] : null;
+  const selectedNote: NoteData | null = selectedNoteId ? notes[selectedNoteId] : null;
   const handleSelectNote = (id: string) => {
     setSelectedNoteId(id);
+    setIsCreating(false);
+    setIsEditing(false);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleCreateNewNote = () => {
+    setSelectedNoteId(null);
+    setIsCreating(true);
+    setIsEditing(false);
   };
 
   const handleLogout = () => {
@@ -37,40 +68,65 @@ export const NotesLayout = () => {
     >
       <AppShell.Header withBorder>
         <Flex h="100%" align="center" p="md">
-          {/* Левая часть — бургер */}
-          <Group justify="flex-start" w={200}>
-            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          </Group>
+          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
 
-          {/* Центр — редактировать / удалить */}
-          <Flex justify="center" align="center" style={{ flex: 1 }}>
-            <ActionIcon variant="subtle" aria-label="Удалить" disabled={!selectedNote}>
-              <TbTrash />
-            </ActionIcon>
-            <ActionIcon variant="subtle" aria-label="Редактировать" disabled={!selectedNote}>
-              <TbEdit />
-            </ActionIcon>
-          </Flex>
-
-          {/* Правая часть — имя пользователя и логаут */}
-          <Group justify="flex-end" w={200}>
-            {user && (
+          <Flex justify="center" align="center" style={{ flex: 1 }} gap="sm">
+            {selectedNote && (
               <>
+                <ActionIcon variant="subtle" aria-label="Удалить">
+                  <TbTrash />
+                </ActionIcon>
+                <ActionIcon onClick={handleEdit} variant="subtle" aria-label="Редактировать">
+                  {isEditing ? <TbDeviceFloppy /> : <TbEdit />}
+                </ActionIcon>
+              </>
+            )}
+          </Flex>
+          <Flex align="center" gap="md">
+            <TextInput
+              placeholder="Поиск заметок..."
+              variant="filled"
+              radius="md"
+              size="sm"
+              leftSection={<TbSearch size="1rem" />}
+              value={searchQuery}
+              style={{ width: 200 }}
+              onChange={handleSearch}
+            />
+
+            {user && (
+              <Flex align="center" gap="sm">
                 <Text fw={500}>{user.name}</Text>
                 <ActionIcon variant="subtle" onClick={handleLogout}>
                   <TbLogout />
                 </ActionIcon>
-              </>
+              </Flex>
             )}
-          </Group>
+          </Flex>
         </Flex>
       </AppShell.Header>
 
       <AppShell.Navbar p="md" withBorder>
+        <Flex justify="center" mb="sm">
+          <ActionIcon
+            onClick={handleCreateNewNote}
+            bg="dark.6"
+            style={{
+              width: '60%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            size="lg"
+          >
+            <TbPlus size="1.5rem" />
+          </ActionIcon>
+        </Flex>
+
         {isLoading ? (
           <div>Loading...</div>
         ) : (
-          Object.entries(notes).map(([id, { title, content, createdAt }]) => {
+          filtredNotes.map(([id, { title, content, createdAt }]) => {
             const isSelected = id === selectedNoteId;
 
             return (
@@ -95,12 +151,22 @@ export const NotesLayout = () => {
         )}
       </AppShell.Navbar>
       <AppShell.Main pt={80}>
-        {selectedNote ? (
-          <NoteViewer
-            title={selectedNote.title}
-            content={selectedNote.content}
-            createdAt={selectedNote.createdAt}
+        {isCreating ? (
+          <NoteEditor
+            id=""
+            selectedNote={{ title: '', content: '' }}
+            setIsCreating={setIsCreating}
           />
+        ) : selectedNote ? (
+          isEditing ? (
+            <NoteEditor id={selectedNoteId!} selectedNote={selectedNote} />
+          ) : (
+            <NoteViewer
+              title={selectedNote.title}
+              content={selectedNote.content}
+              createdAt={selectedNote.createdAt}
+            />
+          )
         ) : (
           <NotePlaceholder />
         )}
