@@ -8,13 +8,22 @@ export const useFetchNotes = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const notesDbRef = ref(db, 'notes');
+    const cached = localStorage.getItem('notes');
+    if (cached) {
+      setNotes(JSON.parse(cached));
+      setIsLoading(false);
+    }
 
+    const notesDbRef = ref(db, 'notes');
     const unsubscribe = onValue(notesDbRef, (snapshot) => {
       const loadedNotes = (snapshot.val() || {}) as NotesRecord;
-
       setNotes(loadedNotes);
       setIsLoading(false);
+      try {
+        localStorage.setItem('notes', JSON.stringify(loadedNotes));
+      } catch (err) {
+        console.error('Failed to save notes to localStorage:', err);
+      }
     });
 
     return unsubscribe;
