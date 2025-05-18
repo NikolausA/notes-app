@@ -1,9 +1,7 @@
-export interface Note {
+export interface NoteData {
   title: string;
   content: string;
-  createdAt: string;
+  createdAt?: string | Date;
 }
 
-export interface Notes {
-  [id: string]: Note;
-}
+export type NotesRecord = Record<string, NoteData>;
