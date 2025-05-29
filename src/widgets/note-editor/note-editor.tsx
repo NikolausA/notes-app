@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Group, Paper, Stack, Textarea, TextInput, Title } from '@mantine/core';
 import { useAddNote, useUpdateNote } from '../../entities';
 import { NoteData, useDebounce } from '../../shared';
+import { MarkdownViewer } from '../markdown-viewer/markdown-viewer';
 
 type NoteEditorProps = {
   id: string;
@@ -24,7 +25,11 @@ export const NoteEditor = ({ id, selectedNote, setIsCreating }: NoteEditorProps)
   };
 
   useDebounce(
-    () => requestUpdateNote(id, { ...inputs, createdAt: new Date().toISOString() }),
+    () => {
+      if (id.length) {
+        requestUpdateNote(id, { ...inputs, createdAt: new Date().toISOString() });
+      }
+    },
     500,
     [inputs]
   );
@@ -48,27 +53,35 @@ export const NoteEditor = ({ id, selectedNote, setIsCreating }: NoteEditorProps)
         {id ? 'Редактирование заметки' : 'Новая заметка'}
       </Title>
       <Stack>
-        <TextInput onChange={handleChange} name="title" value={inputs.title} />
-        <Textarea onChange={handleChange} name="content" value={inputs.content} />
+        <TextInput
+          name="title"
+          value={inputs.title}
+          onChange={handleChange}
+          placeholder="Заголовок"
+        />
+
+        {id ? (
+          <MarkdownViewer content={inputs.content} />
+        ) : (
+          <Textarea
+            name="content"
+            value={inputs.content}
+            onChange={handleChange}
+            placeholder="Содержимое (Markdown поддерживается)"
+            autosize
+            minRows={5}
+          />
+        )}
+
         {!id && (
           <Group justify="center" mt="md">
-            <Button
-              size="md"
-              onClick={handleSubmit}
-              type="submit"
-              disabled={!inputs.title || !inputs.content}
-            >
+            <Button size="md" onClick={handleSubmit} disabled={!inputs.title || !inputs.content}>
               Сохранить
             </Button>
-            <Button
-              size="md"
-              onClick={handleReset}
-              type="submit"
-              disabled={!inputs.title && !inputs.content}
-            >
+            <Button size="md" onClick={handleReset} disabled={!inputs.title && !inputs.content}>
               Очистить
             </Button>
-            <Button size="md" onClick={handleClose} type="submit">
+            <Button size="md" onClick={handleClose}>
               Закрыть
             </Button>
           </Group>

@@ -147,7 +147,14 @@ export const NotesLayout = () => {
           </Flex>
         </AppShell.Header>
 
-        <AppShell.Navbar p="md" withBorder>
+        <AppShell.Navbar
+          p="md"
+          withBorder
+          style={{
+            overflowY: 'auto',
+            maxHeight: 'calc(100vh - 60px)',
+          }}
+        >
           <Flex justify="center" mb="sm">
             <ActionIcon
               onClick={handleCreateNewNote}

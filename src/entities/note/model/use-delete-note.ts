@@ -1,5 +1,5 @@
 import { ref, remove } from 'firebase/database';
-import { db } from '../../../firebase';
+import { db } from '../../firebase';
 
 export const useDeleteNote = () => {
   const requestDeleteNote = (id: string) => {

@@ -1,6 +1,6 @@
 import { push, ref } from 'firebase/database';
-import { db } from '../../../firebase';
 import { NoteData } from '../../../shared';
+import { db } from '../../firebase';
 
 export const useAddNote = () => {
   const requestAddNote = async (newNote: NoteData) => {

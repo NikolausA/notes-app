@@ -1,6 +1,6 @@
 import { ref, update } from 'firebase/database';
-import { db } from '../../../firebase';
 import { NoteData } from '../../../shared';
+import { db } from '../../firebase';
 
 export const useUpdateNote = () => {
   const requestUpdateNote = (id: string, note: NoteData) => {

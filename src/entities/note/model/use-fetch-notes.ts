@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { onValue, ref } from 'firebase/database';
-import { db } from '../../../firebase';
 import { NotesRecord } from '../../../shared';
+import { db } from '../../firebase';
 
 export const useFetchNotes = () => {
   const [notes, setNotes] = useState<NotesRecord>({});
