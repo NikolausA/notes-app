@@ -1,24 +1,20 @@
 import { Route, Routes } from 'react-router-dom';
-import { Notes } from '../shared';
-import { NotePlaceholder, NoteViewer } from '../widgets';
+import { NotesLayout } from '../app';
+import { PrivateRoute } from '../features';
+import { LoginForm } from '../widgets';
 
-export const Routering = ({ selectedNote }: Notes) => {
+export const Routering = () => {
   return (
     <Routes>
-      {selectedNote ? (
-        <Route
-          path="/"
-          element={
-            <NoteViewer
-              title={selectedNote.title}
-              content={selectedNote.content}
-              createdAt={selectedNote.createdAt}
-            />
-          }
-        />
-      ) : (
-        <Route path="/" element={<NotePlaceholder />} />
-      )}
+      <Route path="/login" element={<LoginForm />} />
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <NotesLayout />
+          </PrivateRoute>
+        }
+      />
     </Routes>
   );
 };
