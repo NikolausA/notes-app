@@ -13,7 +13,7 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 
-COPY nginx.config /etc/nginx/conf.d/default.conf
+COPY nginx.temp.config /etc/nginx/conf.d/default.conf
 
 RUN mkdir -p /var/www/certbot
 
